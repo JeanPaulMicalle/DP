@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cab Booking Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Cab Booking Platform</h1>
+      <p id="sessionText">Use the forms below to manage rides through the API Gateway.</p>
+    </div>
+    <div class="top-actions">
+      <span id="connectionStatus" class="status-pill">Checking gateway</span>
+      <button id="logoutButton" class="secondary" onclick="logout()" hidden>Logout</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel auth-panel">
+      <div class="tabs">
+        <button class="tab active" onclick="showAuthTab('login')" id="loginTab">Login</button>
+        <button class="tab" onclick="showAuthTab('register')" id="registerTab">Register</button>
+      </div>
+
+      <form id="loginForm" onsubmit="login(event)">
+        <label>Email</label>
+        <input id="loginEmail" type="email" placeholder="test@example.com" required>
+
+        <label>Password</label>
+        <input id="loginPassword" type="password" placeholder="password123" required>
+
+        <button type="submit">Login</button>
+      </form>
+
+      <form id="registerForm" onsubmit="register(event)" hidden>
+        <label>First name</label>
+        <input id="registerFirstName" type="text" required>
+
+        <label>Surname</label>
+        <input id="registerSurname" type="text" required>
+
+        <label>Email</label>
+        <input id="registerEmail" type="email" required>
+
+        <label>Password</label>
+        <input id="registerPassword" type="password" minlength="6" required>
+
+        <button type="submit">Create Account</button>
+      </form>
+    </section>
+
+    <section class="workspace">
+      <nav class="section-tabs">
+        <button class="section-tab active" data-section="bookings" onclick="showSection('bookings')">Bookings</button>
+        <button class="section-tab" data-section="locations" onclick="showSection('locations')">Locations</button>
+        <button class="section-tab" data-section="payments" onclick="showSection('payments')">Payments</button>
+        <button class="section-tab" data-section="inbox" onclick="showSection('inbox')">Inbox</button>
+      </nav>
+
+      <p id="message" class="message"></p>
+
+      <section id="bookingsSection" class="section">
+        <div class="split">
+          <form class="panel" onsubmit="createBooking(event)">
+            <h2>New Booking</h2>
+
+            <label>Starting location</label>
+            <input id="bookingStart" type="text" placeholder="Valletta" required>
+
+            <label>Ending location</label>
+            <input id="bookingEnd" type="text" placeholder="Sliema" required>
+
+            <label>Date and time</label>
+            <input id="bookingDateTime" type="datetime-local" required>
+
+            <label>Passengers</label>
+            <input id="bookingPassengers" type="number" min="1" max="8" value="1" required>
+
+            <label>Cab type</label>
+            <select id="bookingCabType">
+              <option>Economic</option>
+              <option>Premium</option>
+              <option>Executive</option>
+            </select>
+
+            <button type="submit">Create Booking</button>
+          </form>
+
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>Bookings</h2>
+              <button class="secondary" onclick="loadBookings()">Refresh</button>
+            </div>
+            <div class="button-row">
+              <button class="secondary" onclick="loadBookings('current')">Current</button>
+              <button class="secondary" onclick="loadBookings('past')">Past</button>
+            </div>
+            <div id="bookingList" class="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="locationsSection" class="section" hidden>
+        <div class="split">
+          <form class="panel" onsubmit="saveLocation(event)">
+            <h2>Favourite Pickup</h2>
+
+            <input id="locationId" type="hidden">
+
+            <label>Label</label>
+            <input id="locationLabel" type="text" placeholder="Home" required>
+
+            <label>Address</label>
+            <input id="locationAddress" type="text" placeholder="Valletta, Malta" required>
+
+            <label>Latitude</label>
+            <input id="locationLatitude" type="number" step="any">
+
+            <label>Longitude</label>
+            <input id="locationLongitude" type="number" step="any">
+
+            <button type="submit">Save Location</button>
+            <button type="button" class="secondary" onclick="clearLocationForm()">Clear</button>
+          </form>
+
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>Saved Locations</h2>
+              <button class="secondary" onclick="loadLocations()">Refresh</button>
+            </div>
+            <div id="locationList" class="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="paymentsSection" class="section" hidden>
+        <div class="split">
+          <form class="panel" onsubmit="payForBooking(event)">
+            <h2>Pay Booking</h2>
+
+            <label>Booking ID</label>
+            <input id="paymentBookingId" type="text" required>
+
+            <label>Discount multiplier</label>
+            <input id="paymentDiscount" type="number" min="0.1" max="1" step="0.01" value="1">
+
+            <label>Test cab fare</label>
+            <input id="paymentFare" type="number" min="1" step="0.01" value="15" required>
+
+            <label>Departure latitude</label>
+            <input id="paymentDepLat" type="number" step="any" value="52.50">
+
+            <label>Departure longitude</label>
+            <input id="paymentDepLng" type="number" step="any" value="13.43">
+
+            <label>Arrival latitude</label>
+            <input id="paymentArrLat" type="number" step="any" value="52.47">
+
+            <label>Arrival longitude</label>
+            <input id="paymentArrLng" type="number" step="any" value="13.63">
+
+            <button type="submit">Pay</button>
+          </form>
+
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>Payments</h2>
+              <button class="secondary" onclick="loadPayments()">Refresh</button>
+            </div>
+            <div id="paymentList" class="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="inboxSection" class="section" hidden>
+        <div class="panel">
+          <div class="panel-heading">
+            <h2>Inbox</h2>
+            <button class="secondary" onclick="loadNotifications()">Refresh</button>
+          </div>
+          <div id="notificationList" class="list"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

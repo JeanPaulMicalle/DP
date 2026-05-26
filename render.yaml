@@ -1,0 +1,76 @@
+services:
+  - type: web
+    name: cab-customer-service
+    env: node
+    rootDir: services/customer-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+
+  - type: web
+    name: cab-booking-service
+    env: node
+    rootDir: services/booking-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: CUSTOMER_SERVICE_URL
+        sync: false
+      - key: CAB_READY_DELAY_MS
+        value: 180000
+
+  - type: web
+    name: cab-payment-service
+    env: node
+    rootDir: services/payment-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: BOOKING_SERVICE_URL
+        sync: false
+      - key: TAXI_FARE_API_URL
+        sync: false
+      - key: TAXI_FARE_API_KEY
+        sync: false
+      - key: TAXI_FARE_API_HOST
+        sync: false
+
+  - type: web
+    name: cab-location-service
+    env: node
+    rootDir: services/location-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: WEATHER_API_URL
+        sync: false
+      - key: WEATHER_API_KEY
+        sync: false
+      - key: WEATHER_API_HOST
+        sync: false
+
+  - type: web
+    name: cab-api-gateway
+    env: node
+    rootDir: gateway-service
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: CUSTOMER_SERVICE_URL
+        sync: false
+      - key: BOOKING_SERVICE_URL
+        sync: false
+      - key: PAYMENT_SERVICE_URL
+        sync: false
+      - key: LOCATION_SERVICE_URL
+        sync: false
